@@ -1,0 +1,1473 @@
+{
+    "ownership": {
+        "WW": [
+            "ALR",
+            "HEI",
+            "HAM",
+            "HAMW",
+            "DHAT",
+            "DVAT",
+            "EID",
+            "FRI",
+            "JL",
+            "JH",
+            "HL",
+            "HH",
+            "EMS",
+            "HRZ",
+            "HAN",
+            "ML",
+            "MM",
+            "MH",
+            "CL",
+            "CH",
+            "SL",
+            "SH"
+        ],
+        "ALR": [
+            "JL",
+            "JH",
+            "HL",
+            "HH",
+            "ALR",
+            "HEI",
+            "EID",
+            "FRI",
+            "HAM",
+            "HAMW",
+            "DHAT"
+        ],
+        "HEI": [
+            "HEI",
+            "ALR",
+            "EID",
+            "HAM",
+            "HAMW",
+            "DHAT",
+            "FRI"
+        ],
+        "HAM": [
+            "HAM",
+            "HAMW",
+            "DHAT"
+        ],
+        "HAMW": [
+            "HAMW",
+            "HAM"
+        ],
+        "DHAT": [
+            "DHAT"
+        ],
+        "EID": [
+            "JL",
+            "JH",
+            "HL",
+            "HH",
+            "EID",
+            "FRI"
+        ],
+        "MRZ": [
+            "MRZ",
+            "MAR",
+            "NLR",
+            "OSE12",
+            "OSE22"
+        ],
+        "OSE12": [
+            "OSE12",
+            "OSE22",
+            "HVL12"
+        ],
+        "OSE22": [
+            "OSE22",
+            "HVL12"
+        ],
+        "FRI": [
+            "FRI"
+        ],
+        "JL": [
+            "JL",
+            "HL",
+            "JH",
+            "HH"
+        ],
+        "JH": [
+            "JH",
+            "JL",
+            "HH",
+            "HL"
+        ],
+        "HL": [
+            "HL",
+            "JL",
+            "HH",
+            "JH"
+        ],
+        "HH": [
+            "HH",
+            "HL",
+            "JH",
+            "JL"
+        ],
+        "EMS": [
+            "ML",
+            "MM",
+            "MH",
+            "CL",
+            "CH",
+            "SL",
+            "SH",
+            "EMS",
+            "HRZ",
+            "HAN",
+            "DVAT"
+        ],
+        "HRZ": [
+            "HRZ",
+            "EMS",
+            "HAN",
+            "DVAT"
+        ],
+        "HAN": [
+            "HAN",
+            "DVAT"
+
+        ],
+        "DVAT": [
+            "DVAT"
+
+        ],
+        "SL": [
+            "SL",
+            "SH",
+            "CL",
+            "CH",
+            "ML",
+            "MM",
+            "MH"
+        ],
+        "SH": [
+            "SH",
+            "CH",
+            "MH"
+        ],
+        "CL": [
+            "CL",
+            "CH",
+            "SL",
+            "SH",
+            "ML",
+            "MM",
+            "MH"
+        ],
+        "CH": [
+            "CH",
+            "SH",
+            "MH"
+        ],
+        "ML": [
+            "MM",
+            "ML",
+            "MH",
+            "RL",
+            "RH",
+            "SL",
+            "SH",
+            "CL",
+            "CH"
+        ],
+        "MM": [
+            "MM",
+            "ML",
+            "MH"
+        ],
+        "MH": [
+            "MM",
+            "MH"
+        ],
+        "RL": [
+            "RL",
+            "RH",
+            "ML",
+            "MM",
+            "MH"
+        ],
+        "RH": [
+            "RH",
+            "MM",
+            "MH"
+        ],
+        "BB": [
+            "JL",
+            "JH",
+            "HL",
+            "HH",
+            "CL",
+            "CH",
+            "SL",
+            "SH",
+            "ML",
+            "MM",
+            "MH"
+        ]
+    },
+    "priority": {
+        "DBGE": [
+            "DBGE",
+            "DBGA",
+            "DBGN",
+            "DBGS",
+            "DBTN",
+            "DBTS",
+            "DBDS",
+            "DBDN",
+            "DBAS",
+            "DBAN",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DBGA": [
+            "DBGA",
+            "DBGE",
+            "DBGS",
+            "DBGN",
+            "DBTN",
+            "DBTS",
+            "DBDS",
+            "DBDN",
+            "DBAS",
+            "DBAN",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DBC": [
+            "DBC",
+            "DBGA",
+            "DBGE",
+            "DBGN",
+            "DBGS",
+            "DBTS",
+            "DBTN",
+            "DBDS",
+            "DBDN",
+            "DBAS",
+            "DBAN",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DBGN": [
+            "DBGN",
+            "DBGS",
+            "DBTN",
+            "DBTS",
+            "DBDS",
+            "DBDN",
+            "DBAS",
+            "DBAN",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DBGS": [
+            "DBGS",
+            "DBGN",
+            "DBTS",
+            "DBTN",
+            "DBDS",
+            "DBDN",
+            "DBAS",
+            "DBAN",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DFAN": [
+            "DFAN",
+            "DFANT",
+            "DFDN",
+            "DFAS",
+            "DFAST",
+            "DFDS",
+            "RUD",
+            "DKB",
+            "GCA",
+            "GSA",
+            "GCS"
+        ],
+        "NLT": [
+            "NLT",
+            "NLR",
+            "NLP",
+            "MRZ",
+            "MAR",
+            "WC"
+        ],
+        "NLA": [
+            "NLA",
+            "NLT",
+            "NLR",
+            "NLP",
+            "MRZ",
+            "MAR",
+            "WC"
+        ],
+        "AHT": [
+            "AHT",
+            "MRZ",
+            "MAR",
+            "WC"
+        ],
+        "DBTN": [
+            "DBTN",
+            "DBTS",
+            "DBDS",
+            "DBDN",
+            "DBAS",
+            "DBAN",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DBTS": [
+            "DBTS",
+            "DBTN",
+            "DBDS",
+            "DBDN",
+            "DBAS",
+            "DBAN",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DHT": [
+            "DHT",
+            "HAM",
+            "HEI",
+            "ALR",
+            "WW",
+            "WC"
+        ],
+        "DVT": [
+            "DVT",
+            "HAN",
+            "HRZ",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "DWT": [
+            "DWT",
+            "FRI",
+            "EID",
+            "ALR",
+            "HEI",
+            "WW",
+            "WC"
+        ],
+        "HLT": [
+            "HLT",
+            "HAM",
+            "HEI",
+            "ALR",
+            "WW",
+            "WC"
+        ],
+        "VET": [
+            "VET",
+            "HAN",
+            "HRZ",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "VKT": [
+            "VKT",
+            "HRZ",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "XWT": [
+            "XWT",
+            "EID",
+            "ALR",
+            "HEI",
+            "WW",
+            "WC"
+        ],
+        "HBT": [
+            "HBT",
+            "HBR",
+            "NWR",
+            "HAN",
+            "HRZ",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "HCT": [
+            "HCT",
+            "HCR",
+            "HAN",
+            "HRZ",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "HST": [
+            "HST",
+            "HSR",
+            "HCR",
+            "HAN",
+            "HRZ",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "MNT": [
+            "MNT",
+            "MNR",
+            "NTR",
+            "EID",
+            "ALR",
+            "HEI",
+            "WW",
+            "WC"
+        ],
+        "NDT": [
+            "NDT",
+            "EMS",
+            "HRZ",
+            "WW",
+            "WC"
+        ],
+        "NHT": [
+            "NHT",
+            "NHR",
+            "NSR",
+            "EID",
+            "ALR",
+            "HEI",
+            "WW",
+            "WC"
+        ],
+        "NST": [
+            "NST",
+            "NSR",
+            "EID",
+            "ALR",
+            "HEI",
+            "WW",
+            "WC"
+        ],
+        "NTT": [
+            "NTT",
+            "NTR",
+            "FRI",
+            "EID",
+            "ALR",
+            "HEI",
+            "WW",
+            "WC"
+        ],
+        "SHT": [
+            "SHT",
+            "SHR",
+            "DBAS",
+            "DBAN",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DBANT": [
+            "DBANT",
+            "DBAST",
+            "DBAN",
+            "DBAS",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DBAST": [
+            "DBAST",
+            "DBANT",
+            "DBAS",
+            "DBAN",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DHAT": [
+            "DHAT",
+            "HAM",
+            "HEI",
+            "ALR",
+            "WW",
+            "WC"
+        ],
+        "DVAT": [
+            "DVAT",
+            "HAN",
+            "HRZ",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "EPSC": [
+            "EPSC",
+            "EPWB",
+            "EPWG",
+            "EPWN",
+            "EPWW",
+            "EPWU"
+        ],
+        "HFR": [
+            "HFR"
+        ],
+        "EMS": [
+            "EMS",
+            "HRZ",
+            "WW",
+            "WC"
+        ],
+        "HBR": [
+            "HBR",
+            "NWR"
+        ],
+        "HCR": [
+            "HCR"
+        ],
+        "HSR": [
+            "HSR",
+            "HCR"
+        ],
+        "MNR": [
+            "MNR",
+            "NTR"
+        ],
+        "NHR": [
+            "NHR",
+            "NSR"
+        ],
+        "NLR": [
+            "NLR",
+            "NLP"
+        ],
+        "NSR": [
+            "NSR"
+        ],
+        "NTR": [
+            "NTR"
+        ],
+        "NWR": [
+            "NWR"
+        ],
+        "NWT": [
+            "NWT",
+            "NWR"
+        ],
+        "SHR": [
+            "SHR"
+        ],
+        "ESMI": [
+            "ESMI",
+            "ESMIN"
+        ],
+        "ESMXL": [
+            "ESMXL"
+        ],
+        "ESML": [
+            "ESML",
+            "ESMK",
+            "ESM8",
+            "ESM7",
+            "ESMY",
+            "ESM2",
+            "ESAA",
+            "EKDB"
+        ],
+        "ELLX": [
+            "ELLX",
+            "EBBL",
+            "EBBH",
+            "EBBE",
+            "EBBW",
+            "EBBUL"
+        ],
+        "BOT": [
+            "BOT",
+            "DLD",
+            "DLA",
+            "DLAT",
+            "DKLA",
+            "GGN",
+            "GGNH"
+        ],
+        "DKA": [
+            "DKA",
+            "NOR",
+            "DKAT",
+            "DKLA",
+            "GGN",
+            "GGNH"
+        ],
+        "DLD": [
+            "DLD",
+            "DLA",
+            "BOT",
+            "DLAT",
+            "DKLA",
+            "GGN",
+            "GGNH"
+        ],
+        "EIF": [
+            "EIF",
+            "RUD",
+            "RUDH",
+            "GGC",
+            "GGCA",
+            "GGCH",
+            "GGCS",
+            "GGCSH"
+        ],
+        "HMM": [
+            "HMM",
+            "PAD",
+            "PADH",
+            "GGN",
+            "GGNH",
+            "GGA",
+            "GGAH"
+        ],
+        "NOR": [
+            "NOR",
+            "DKLA",
+            "GGN",
+            "GGNH"
+        ],
+        "PADL": [
+            "PADL",
+            "PAD",
+            "HMM",
+            "PADH",
+            "GGN",
+            "GGNH",
+            "GGA",
+            "GGAH"
+        ],
+        "PFA": [
+            "PFA",
+            "RUD",
+            "RUDH",
+            "GGC",
+            "GGCA",
+            "GGCH",
+            "GGCS",
+            "GGCSH"
+        ],
+        "REU": [
+            "REU",
+            "STG",
+            "BAD",
+            "BADH",
+            "GGS",
+            "GGSA",
+            "GGSH",
+            "GGCS",
+            "GGCSH"
+        ],
+        "STG": [
+            "STG",
+            "REU",
+            "BAD",
+            "BADH",
+            "GGS",
+            "GGSA",
+            "GGSH",
+            "GGCS",
+            "GGCSH"
+        ],
+        "SAS": [
+            "SAS",
+            "MEI",
+            "TRS",
+            "GER",
+            "HOF",
+            "HAL"
+        ],
+        "TRN": [
+            "TRN",
+            "TRS",
+            "GER",
+            "MEI",
+            "HAL",
+            "HOF"
+        ],
+        "TRS": [
+            "TRS",
+            "TRN",
+            "GER",
+            "MEI",
+            "HAL",
+            "HOF"
+        ],
+        "DBAN": [
+            "DBAN",
+            "DBAS",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DBAS": [
+            "DBAS",
+            "DBAN",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DBDN": [
+            "DBDN",
+            "DBDS",
+            "DBAS",
+            "DBAN",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "DBDS": [
+            "DBDS",
+            "DBDN",
+            "DBAS",
+            "DBAN",
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "FRI": [
+            "FRI",
+            "EID",
+            "ALR",
+            "HEI",
+            "WW",
+            "WC"
+        ],
+        "HAM": [
+            "HAM",
+            "HEI",
+            "ALR",
+            "WW",
+            "WC"
+        ],
+        "HAMW": [
+            "HAMW",
+            "HAM",
+            "HEI",
+            "ALR",
+            "WW",
+            "WC"
+        ],
+        "HAN": [
+            "HAN",
+            "HRZ",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "EHGA": [
+            "EHGA",
+            "EHAE",
+            "EHAL",
+            "EHAA",
+            "EHAS",
+            "EHAW"
+        ],
+        "EHMC": [
+            "EHMC",
+            "EHAE",
+            "EHAL",
+            "EHAA",
+            "EHAW",
+            "EHAS"
+        ],
+        "EHAE": [
+            "EHAE",
+            "EHAL",
+            "EHAA",
+            "EHAS",
+            "EHAW"
+        ],
+        "EKRN": [
+            "EKRN",
+            "EKDA",
+            "EKDC",
+            "EKUA",
+            "EKUC",
+            "EKUN",
+            "EKDK"
+        ],
+        "EKSA": [
+            "EKSA",
+            "EKDN",
+            "EKDV",
+            "EKUN",
+            "EKDK",
+            "EKUV"
+        ],
+        "LFST": [
+            "LFST",
+            "LFEUE",
+            "LFEE"
+        ],
+        "LKPR": [
+            "LKPR",
+            "LKAL",
+            "LKAC"
+        ],
+        "LKMT": [
+            "LKMT",
+            "LKAR",
+            "LKAN",
+            "LKAL",
+            "LKAC"
+        ],
+        "EBBL": [
+            "EBBL",
+            "EBBH",
+            "EBBE",
+            "EBBW",
+            "EBBUL"
+        ],
+        "EBBI": [
+            "EBBI"
+        ],
+        "LNH": [
+            "LNH",
+            "EBBU",
+            "EBBE",
+            "EBBW"
+        ],
+        "FFM": [
+            "FFM",
+            "NTM",
+            "FUL",
+            "UUC",
+            "UUCW",
+            "GINH",
+            "GGCH",
+            "GGAH",
+            "GGCSH"
+        ],
+        "FUL": [
+            "FUL",
+            "FFM",
+            "UUC",
+            "UUCW",
+            "GINH",
+            "GGCH",
+            "GGAH",
+            "GGCSH"
+        ],
+        "GED": [
+            "GED",
+            "HEF",
+            "GIN",
+            "GINH",
+            "GGC",
+            "GGCA",
+            "GGCH",
+            "GGA",
+            "GGAH",
+            "GGCS",
+            "GGCSH"
+        ],
+        "GIN": [
+            "GIN",
+            "GINH",
+            "SIG",
+            "GGC",
+            "GGCA",
+            "GGCH",
+            "GGA",
+            "GGAH",
+            "GGCS",
+            "GGCSH"
+        ],
+        "HEF": [
+            "HEF",
+            "GIN",
+            "GINH",
+            "GGC",
+            "GGCA",
+            "GGCH",
+            "GGA",
+            "GGAH",
+            "GGCS",
+            "GGCSH"
+        ],
+        "KIR": [
+            "KIR",
+            "RUD",
+            "RUDH",
+            "GGC",
+            "GGCA",
+            "GGCH",
+            "GGCS",
+            "GGCSH"
+        ],
+        "LBU": [
+            "LBU",
+            "BAD",
+            "BADH",
+            "GGS",
+            "GGSA",
+            "GGSH",
+            "GGCS",
+            "GGCSH"
+        ],
+        "NTM": [
+            "NTM",
+            "FUL",
+            "UUW",
+            "UUCW",
+            "RUDH",
+            "GGCH",
+            "GGCSH"
+        ],
+        "PAD": [
+            "PAD",
+            "PADH",
+            "GGN",
+            "GGNH",
+            "GGA",
+            "GGAH"
+        ],
+        "RUD": [
+            "RUD",
+            "RUDH",
+            "KIR",
+            "GGC",
+            "GGCA",
+            "GGCH",
+            "GGCS",
+            "GGCSH"
+        ],
+        "SIG": [
+            "SIG",
+            "TAU",
+            "GIN",
+            "GINH",
+            "GGC",
+            "GGCA",
+            "GGCH",
+            "GGA",
+            "GGAH",
+            "GGCS",
+            "GGCSH"
+        ],
+        "TAU": [
+            "TAU",
+            "SIG",
+            "GIN",
+            "GINH",
+            "GGC",
+            "GGCA",
+            "GGCH",
+            "GGA",
+            "GGAH",
+            "GGCS",
+            "GGCSH"
+        ],
+        "SLN": [
+            "SLN",
+            "UUW",
+            "UUCW",
+            "BADH",
+            "GGSH",
+            "GGCSH"
+        ],
+        "MM": [
+            "MM",
+            "ML",
+            "MH",
+            "RL",
+            "RH",
+            "PADH",
+            "GGNH",
+            "GGAH",
+            "SL",
+            "SH",
+            "BB",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "ML": [
+            "MM",
+            "ML",
+            "MH",
+            "RL",
+            "RH",
+            "PADH",
+            "GGNH",
+            "GGAH",
+            "SL",
+            "SH",
+            "BB",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "RL": [
+            "RL",
+            "RH",
+            "ML",
+            "MH",
+            "GGNH"
+        ],
+        "RH": [
+            "RH",
+            "MH",
+            "RL",
+            "ML",
+            "GGNH"
+        ],
+        "BBG": [
+            "BBG",
+            "HOF",
+            "RDG"
+        ],
+        "GER": [
+            "GER",
+            "HAL",
+            "MEI",
+            "HOF"
+        ],
+        "HAL": [
+            "HAL",
+            "GER",
+            "MEI",
+            "HOF"
+        ],
+        "HOF": [
+            "HOF",
+            "BBG",
+            "RDG"
+        ],
+        "MEI": [
+            "MEI",
+            "GER",
+            "HOF",
+            "HAL"
+        ],
+        "NDG": [
+            "NDG",
+            "TRU",
+            "WLD",
+            "ZUG",
+            "RDG"
+        ],
+        "ERL": [
+            "ERL",
+            "SAL",
+            "BBG",
+            "HOF",
+            "RDG"
+        ],
+        "ISA": [
+            "ISA",
+            "CHI",
+            "NDG",
+            "WLD",
+            "TRU",
+            "ZUG",
+            "RDG"
+        ],
+        "SAL": [
+            "SAL",
+            "SPE",
+            "HVL12",
+            "GER",
+            "MEI",
+            "HOF",
+            "HAL"
+        ],
+        "SPE": [
+            "SPE",
+            "SAL",
+            "HVL12",
+            "MEI",
+            "GER",
+            "HOF",
+            "HAL"
+        ],
+        "HVL22": [
+            "OSE22",
+            "HVL12",
+            "OSE12",
+            "BOR",
+            "FLG",
+            "MAR",
+            "WC"
+        ],
+        "HVL12": [
+            "HVL12",
+            "OSE12",
+            "BOR",
+            "FLG",
+            "MAR",
+            "WC"
+        ],
+        "OSE22": [
+            "OSE22",
+            "OSE12",
+            "HVL12",
+            "MRZ",
+            "MAR",
+            "WC"
+        ],
+        "OSE12": [
+            "OSE12",
+            "HVL12",
+            "MRZ",
+            "MAR",
+            "WC"
+        ],
+        "ALR": [
+            "ALR",
+            "HEI",
+            "WW",
+            "WC"
+        ],
+        "BOR": [
+            "BOR",
+            "FLG",
+            "MAR",
+            "WC"
+        ],
+        "EID": [
+            "EID",
+            "ALR",
+            "HEI",
+            "WW",
+            "WC"
+        ],
+        "FLG": [
+            "FLG",
+            "BOR",
+            "MAR",
+            "WC"
+        ],
+        "HEI": [
+            "HEI",
+            "ALR",
+            "WW",
+            "WC"
+        ],
+        "HRZ": [
+            "HRZ",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "MAR": [
+            "MAR",
+            "BOR",
+            "MRZ",
+            "WC"
+        ],
+        "MRZ": [
+            "MRZ",
+            "MAR",
+            "WC"
+        ],
+        "CH": [
+            "CH",
+            "SH",
+            "MH",
+            "CL",
+            "SL",
+            "ML",
+            "BB",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "CL": [
+            "CL",
+            "CH",
+            "SL",
+            "SH",
+            "ML",
+            "MH",
+            "BB",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "HH": [
+            "HH",
+            "JH",
+            "HL",
+            "JL",
+            "BB",
+            "EID",
+            "ALR",
+            "WW",
+            "WC"
+        ],
+        "HL": [
+            "HL",
+            "HH",
+            "JL",
+            "JH",
+            "BB",
+            "EID",
+            "ALR",
+            "WW",
+            "WC"
+        ],
+        "JH": [
+            "JH",
+            "HH",
+            "JL",
+            "BB",
+            "EID",
+            "ALR",
+            "WW",
+            "WC"
+        ],
+        "JL": [
+            "JL",
+            "JH",
+            "HH",
+            "BB",
+            "EID",
+            "ALR",
+            "WW",
+            "WC"
+        ],
+        "SH": [
+            "SH",
+            "CH",
+            "MH",
+            "SL",
+            "CL",
+            "ML",
+            "BB",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "SL": [
+            "SL",
+            "SH",
+            "CL",
+            "CH",
+            "ML",
+            "MH",
+            "BB",
+            "EMS",
+            "WW",
+            "WC"
+        ],
+        "SCOH": [
+            "SCOH",
+            "SCOS",
+            "SCOE",
+            "SCO"
+        ],
+        "LONNE": [
+            "LONNE",
+            "LONN"
+        ],
+        "WST": [
+            "WST",
+            "EHAA"
+        ],
+        "EHAW": [
+            "EHAW",
+            "EHAL",
+            "EHAA",
+            "EHAS",
+            "EHAE"
+        ],
+        "EKDA": [
+            "EKDA",
+            "EKDC",
+            "EKUA",
+            "EKUC",
+            "EKDK",
+            "EKUN",
+            "EKUV"
+        ],
+        "EKDB": [
+            "EKDB",
+            "EKDA",
+            "EKDI",
+            "EKDD",
+            "EKDE",
+            "EKUA",
+            "EKUC",
+            "EKDK",
+            "EKUN",
+            "EKUV"
+        ],
+        "EKDC": [
+            "EKDC",
+            "EKDA",
+            "EKUC",
+            "EKUA",
+            "EKDK",
+            "EKUN",
+            "EKUV"
+        ],
+        "EKDD": [
+            "EKDD",
+            "EKDC",
+            "EKDI",
+            "EKDE",
+            "EKDB",
+            "EKUC",
+            "EKUA",
+            "EKDK",
+            "EKUN",
+            "EKUV"
+        ],
+        "EKDI": [
+            "EKDI",
+            "EKDA",
+            "EKDD",
+            "EKDB",
+            "EKDE",
+            "EKUA",
+            "EKUC",
+            "EKDK",
+            "EKUN",
+            "EKUV"
+        ],
+        "EKDN": [
+            "EKDN",
+            "EKDV",
+            "EKUN",
+            "EKDK",
+            "EKUV"
+        ],
+        "EKUA": [
+            "EKUA",
+            "EKDA",
+            "EKDC",
+            "EKUC",
+            "EKDK",
+            "EKUN",
+            "EKUV"
+        ],
+        "EKUC": [
+            "EKUC",
+            "EKDC",
+            "EKDA",
+            "EKUA",
+            "EKDK",
+            "EKUN",
+            "EKUV"
+        ],
+        "EKUN": [
+            "EKUN",
+            "EKDN",
+            "EKDV",
+            "EKDK",
+            "EKUV"
+        ],
+        "EPOS": [
+            "EPOS",
+            "EPON",
+            "EPWW",
+            "EPWU"
+        ],
+        "EPWB": [
+            "EPWB",
+            "EPWG",
+            "EPWN",
+            "EPWW",
+            "EPWU",
+            "EEN"
+        ],
+        "EPWU": [
+            "EPWU",
+            "EPWB",
+            "EPWG",
+            "EPWN",
+            "EPWW",
+            "EEN"
+        ],
+        "EPWD": [
+            "EPWD",
+            "EPWW",
+            "EPWU",
+            "EEN"
+        ],
+        "EPWW": [
+            "EPWW",
+            "EPWU",
+            "EEN"
+        ],
+        "GDI": [
+            "GDI",
+            "EPWI"
+        ],
+        "EPOI": [
+            "EPOI",
+            "EPWI"
+        ],
+        "ESM8": [
+            "ESM8",
+            "ESM7",
+            "ESM6",
+            "ESMY",
+            "ESM2",
+            "ESAA"
+        ],
+        "ESM9": [
+            "ESM9",
+            "ESM8",
+            "ESM6",
+            "ESM7",
+            "ESMY",
+            "ESM2",
+            "ESAA"
+        ],
+        "LFEUE": [
+            "LFEUE",
+            "LFEE",
+            "LFFF"
+        ],
+        "LKAU": [
+            "LKAU",
+            "LKAN",
+            "LKAC",
+            "EEN"
+        ],
+        "LKAN": [
+            "LKAN",
+            "LKAL",
+            "LKAC",
+            "EEN"
+        ]
+    }
+}
