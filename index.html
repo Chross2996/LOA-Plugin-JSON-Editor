@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>JSON Airspace Configurator</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header>
+  <div>
+    <h1>JSON Airspace Configurator</h1>
+    <p>Load, edit, validate, and export LOA, sector ownership, and volume JSON files.</p>
+  </div>
+  <div class="actions">
+    <button id="validateAll">Validate</button>
+    <button id="exportAll">Download all (local)</button>
+  </div>
+</header>
+
+<section class="card gh-panel">
+  <div class="gh-row">
+    <label>GitHub token <input type="password" id="ghToken" placeholder="ghp_... (fine-grained PAT, Contents: Read & write)" autocomplete="off"></label>
+    <label>Region / ICAO folder <select id="ghRegion"></select></label>
+    <button id="ghConnect" class="primary">Connect &amp; load</button>
+  </div>
+  <div class="gh-row gh-status-row">
+    <span id="ghStatus" class="small muted">Not connected. Paste a token scoped to Chross2996/LOA-Plugin-Files and pick a region.</span>
+    <button id="ghForget" class="small-btn">Forget token</button>
+  </div>
+</section>
+
+<section class="loader card">
+  <p class="small muted" style="margin:0 0 10px">Or load files from your computer instead of GitHub:</p>
+  <label>LOA JSON <input type="file" id="loaFile" accept=".json,application/json"></label>
+  <label>Sector ownership JSON <input type="file" id="ownershipFile" accept=".json,application/json"></label>
+  <label>Volumes JSON <input type="file" id="volumesFile" accept=".json,application/json"></label>
+</section>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="loa">LOA Rules</button>
+  <button class="tab" data-tab="ownership">Ownership & Priority</button>
+  <button class="tab" data-tab="volumes">Volumes</button>
+  <button class="tab" data-tab="raw">Raw JSON</button>
+  <button class="tab" data-tab="issues">Validation</button>
+</nav>
+
+<section class="card commit-bar" id="commitBar">
+  <span id="dirtyStatus" class="small muted">No changes loaded yet.</span>
+  <div class="actions">
+    <button id="commitLoa" disabled>Commit LOA.json</button>
+    <button id="commitOwnership" disabled>Commit sector_ownership.json</button>
+    <button id="commitVolumes" disabled>Commit volumes.json</button>
+    <button id="commitAll" class="primary" disabled>Commit all changed files</button>
+  </div>
+</section>
+
+<main>
+  <section id="loa" class="panel active"></section>
+  <section id="ownership" class="panel"></section>
+  <section id="volumes" class="panel"></section>
+  <section id="raw" class="panel"></section>
+  <section id="issues" class="panel"></section>
+</main>
+
+<template id="fieldTemplate">
+  <label class="field"><span></span><input /></label>
+</template>
+<script src="app.js"></script>
+</body>
+</html>
