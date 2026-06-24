@@ -98,13 +98,98 @@ async function commitAllChanged(){
   else showToast(`Committed ${keys.map(k=>FILE_NAMES[k]).join(', ')} to ${state.gh.region}.`, 'ok');
   refreshCommitBar();
 }
-async function ghConnectAndLoad(){
-  const token = $('#ghToken').value.trim();
-  const region = $('#ghRegion').value;
-  if(!token){ showToast('Paste a GitHub token first.', 'bad'); return; }
-  state.gh.token = token; state.gh.region = region;
+// ---- GitHub OAuth Device Flow ---------------------------------------------
+// We obtain a user access token by talking to our own Worker, which proxies
+// GitHub's device-flow endpoints (GitHub doesn't send CORS headers, so the
+// browser can't call them directly). No token is ever pasted or stored on disk.
+const sleep = ms => new Promise(r=>setTimeout(r, ms));
+
+async function ghStartDeviceFlow(){
   const statusEl = $('#ghStatus');
+  const box = $('#ghDeviceBox');
+  const connectBtn = $('#ghConnect');
+  try{
+    connectBtn.disabled = true; connectBtn.textContent = 'Starting…';
+    const res = await fetch('/api/device/code', { method:'POST' });
+    const data = await res.json();
+    if(data.error){ throw new Error(data.error_description || data.error); }
+    // data: { device_code, user_code, verification_uri, expires_in, interval }
+    $('#ghUserCode').textContent = data.user_code;
+    $('#ghVerifyLink').href = data.verification_uri || 'https://github.com/login/device';
+    box.classList.remove('hidden');
+    statusEl.textContent = 'Authorize in the GitHub tab, then come back — this page is waiting.';
+    connectBtn.textContent = 'Connect GitHub';
+    await ghPollForToken(data.device_code, (data.interval||5), (data.expires_in||900));
+  } catch(err){
+    statusEl.textContent = `Could not start GitHub sign-in: ${err.message}`;
+    showToast(err.message, 'bad');
+    connectBtn.disabled = false; connectBtn.textContent = 'Connect GitHub';
+  }
+}
+
+async function ghPollForToken(deviceCode, interval, expiresIn){
+  const pollStatus = $('#ghPollStatus');
+  const deadline = Date.now() + expiresIn*1000;
+  let wait = Math.max(interval, 5);
+  while(Date.now() < deadline){
+    await sleep(wait*1000);
+    let data;
+    try{
+      const res = await fetch('/api/device/token', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ device_code: deviceCode })
+      });
+      data = await res.json();
+    } catch(e){ pollStatus.textContent = 'Network hiccup, retrying…'; continue; }
+
+    if(data.access_token){
+      state.gh.token = data.access_token;
+      state.gh.connected = false; // connected-to-repo happens on Load
+      $('#ghDeviceBox').classList.add('hidden');
+      pollStatus.textContent = '';
+      await ghOnAuthenticated();
+      return;
+    }
+    switch(data.error){
+      case 'authorization_pending': pollStatus.textContent = 'Waiting for you to authorize…'; break;
+      case 'slow_down': wait += 5; pollStatus.textContent = 'Slowing down polling…'; break;
+      case 'expired_token':
+        pollStatus.textContent = 'Code expired. Click Connect GitHub to get a new one.';
+        $('#ghConnect').disabled = false; return;
+      case 'access_denied':
+        pollStatus.textContent = 'Authorization was denied.';
+        $('#ghConnect').disabled = false; return;
+      default:
+        pollStatus.textContent = data.error_description || data.error || 'Unknown error.';
+    }
+  }
+  pollStatus.textContent = 'Timed out waiting for authorization. Try Connect GitHub again.';
+  $('#ghConnect').disabled = false;
+}
+
+async function ghOnAuthenticated(){
+  // Confirm who we signed in as, then enable loading.
+  try{
+    const res = await fetch('https://api.github.com/user', { headers: ghHeaders() });
+    const me = await res.json();
+    const login = me.login ? `@${me.login}` : 'your account';
+    $('#ghStatus').textContent = `Signed in as ${login}. Pick a region and click “Load region”.`;
+    showToast(`Signed in as ${login}.`, 'ok');
+  } catch(e){
+    $('#ghStatus').textContent = 'Signed in. Pick a region and click “Load region”.';
+  }
+  $('#ghConnect').disabled = true; $('#ghConnect').textContent = 'Connected';
+  $('#ghLoad').disabled = false;
+}
+
+async function ghLoadRegion(){
+  if(!state.gh.token){ showToast('Sign in with “Connect GitHub” first.', 'bad'); return; }
+  const region = $('#ghRegion').value;
+  state.gh.region = region;
+  const statusEl = $('#ghStatus');
+  const loadBtn = $('#ghLoad');
   statusEl.textContent = `Loading ${region} from ${GH_OWNER}/${GH_REPO}@${GH_BRANCH}…`;
+  loadBtn.disabled = true; loadBtn.textContent = 'Loading…';
   try{
     const [loa, ownership, volumes] = await Promise.all([ghGetFile('loa'), ghGetFile('ownership'), ghGetFile('volumes')]);
     Object.assign(state, { loa, ownership, volumes, currentSector: Object.keys(loa)[0] || null, selectedWaypoint:null, selectedVolume:null });
@@ -117,12 +202,20 @@ async function ghConnectAndLoad(){
     statusEl.textContent = `Failed to load ${region}: ${err.message}`;
     showToast(err.message, 'bad');
   }
+  loadBtn.disabled = false; loadBtn.textContent = 'Load region';
   refreshCommitBar();
 }
+
 function ghForgetToken(){
   state.gh.token = null;
-  $('#ghToken').value = '';
-  showToast('Token cleared from memory.', 'ok');
+  state.gh.connected = false;
+  state.gh.baseline = {loa:null,ownership:null,volumes:null};
+  $('#ghConnect').disabled = false; $('#ghConnect').textContent = 'Connect GitHub';
+  $('#ghLoad').disabled = true;
+  $('#ghDeviceBox').classList.add('hidden');
+  $('#ghStatus').textContent = 'Signed out. Click “Connect GitHub” to sign in again.';
+  showToast('Signed out — token cleared from memory.', 'ok');
+  refreshCommitBar();
 }
 
 function readFile(input, key){
@@ -290,8 +383,10 @@ $('#exportAll').onclick=()=>{ if(state.loa)download('LOA.json',state.loa); if(st
 readFile($('#loaFile'),'loa'); readFile($('#ownershipFile'),'ownership'); readFile($('#volumesFile'),'volumes');
 
 $('#ghRegion').innerHTML = GH_REGIONS.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
-$('#ghConnect').onclick = ghConnectAndLoad;
+$('#ghConnect').onclick = ghStartDeviceFlow;
+$('#ghLoad').onclick = ghLoadRegion;
 $('#ghForget').onclick = ghForgetToken;
+$('#ghCopyCode').onclick = ()=>{ const code = $('#ghUserCode').textContent; navigator.clipboard?.writeText(code).then(()=>showToast('Code copied.', 'ok'), ()=>{}); };
 $('#commitLoa').onclick = ()=>commitFile('loa', $('#commitLoa'));
 $('#commitOwnership').onclick = ()=>commitFile('ownership', $('#commitOwnership'));
 $('#commitVolumes').onclick = ()=>commitFile('volumes', $('#commitVolumes'));

@@ -1,0 +1,16 @@
+name = "airspace-configurator"
+main = "worker/worker.js"
+compatibility_date = "2025-06-01"
+
+# Serve the static site (index.html, app.js, styles.css) from ./public
+# and expose it to the Worker as the env.ASSETS binding.
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+# Your GitHub OAuth App's Client ID. This is NOT a secret — it is safe to commit.
+# Replace the value below with your own after registering the OAuth app
+# (see README-OAUTH.md, step 1). You can also set it in the Cloudflare dashboard
+# under Settings -> Variables instead of here.
+[vars]
+GITHUB_CLIENT_ID = "REPLACE_WITH_YOUR_CLIENT_ID"
