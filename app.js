@@ -6,6 +6,25 @@ const FILE_NAMES = { loa: 'LOA.json', ownership: 'sector_ownership.json', volume
 
 const state = { loa:null, ownership:null, volumes:null, currentSector:null, loaKind:'destinationLoas', selectedWaypoint:null, selectedVolume:null, rawFile:'loa', issues:[],
   gh:{ token:null, region:null, shas:{loa:null,ownership:null,volumes:null}, baseline:{loa:null,ownership:null,volumes:null}, connected:false } };
+
+// ---- Remembering the GitHub login on this computer ------------------------
+// The token is saved in localStorage so the page doesn't ask you to
+// reconnect every time you open it. It's still cleared by "Sign out", and
+// GitHub will reject it naturally once it expires (the app then prompts you
+// to reconnect). Anyone else using this Windows login + browser on this
+// machine would also be able to use this saved session, same as staying
+// logged into any other website.
+const GH_TOKEN_STORAGE_KEY = 'airspaceConfigurator.ghToken';
+function ghSaveToken(token){
+  try{ localStorage.setItem(GH_TOKEN_STORAGE_KEY, token); } catch(e){ /* storage unavailable, ignore */ }
+}
+function ghLoadSavedToken(){
+  try{ return localStorage.getItem(GH_TOKEN_STORAGE_KEY); } catch(e){ return null; }
+}
+function ghClearSavedToken(){
+  try{ localStorage.removeItem(GH_TOKEN_STORAGE_KEY); } catch(e){ /* ignore */ }
+}
+
 const $ = sel => document.querySelector(sel);
 const esc = s => String(s ?? '').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const clone = x => JSON.parse(JSON.stringify(x));
@@ -98,13 +117,104 @@ async function commitAllChanged(){
   else showToast(`Committed ${keys.map(k=>FILE_NAMES[k]).join(', ')} to ${state.gh.region}.`, 'ok');
   refreshCommitBar();
 }
-async function ghConnectAndLoad(){
-  const token = $('#ghToken').value.trim();
-  const region = $('#ghRegion').value;
-  if(!token){ showToast('Paste a GitHub token first.', 'bad'); return; }
-  state.gh.token = token; state.gh.region = region;
+// ---- GitHub OAuth Device Flow ---------------------------------------------
+// We obtain a user access token by talking to our own Worker, which proxies
+// GitHub's device-flow endpoints (GitHub doesn't send CORS headers, so the
+// browser can't call them directly). No token is ever pasted or stored on disk.
+const sleep = ms => new Promise(r=>setTimeout(r, ms));
+
+async function ghStartDeviceFlow(){
   const statusEl = $('#ghStatus');
+  const box = $('#ghDeviceBox');
+  const connectBtn = $('#ghConnect');
+  try{
+    connectBtn.disabled = true; connectBtn.textContent = 'Starting…';
+    const res = await fetch('/api/device/code', { method:'POST' });
+    const data = await res.json();
+    if(data.error){ throw new Error(data.error_description || data.error); }
+    // data: { device_code, user_code, verification_uri, expires_in, interval }
+    $('#ghUserCode').textContent = data.user_code;
+    $('#ghVerifyLink').href = data.verification_uri || 'https://github.com/login/device';
+    box.classList.remove('hidden');
+    statusEl.textContent = 'Authorize in the GitHub tab, then come back — this page is waiting.';
+    connectBtn.textContent = 'Connect GitHub';
+    await ghPollForToken(data.device_code, (data.interval||5), (data.expires_in||900));
+  } catch(err){
+    statusEl.textContent = `Could not start GitHub sign-in: ${err.message}`;
+    showToast(err.message, 'bad');
+    connectBtn.disabled = false; connectBtn.textContent = 'Connect GitHub';
+  }
+}
+
+async function ghPollForToken(deviceCode, interval, expiresIn){
+  const pollStatus = $('#ghPollStatus');
+  const deadline = Date.now() + expiresIn*1000;
+  let wait = Math.max(interval, 5);
+  while(Date.now() < deadline){
+    await sleep(wait*1000);
+    let data;
+    try{
+      const res = await fetch('/api/device/token', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ device_code: deviceCode })
+      });
+      data = await res.json();
+    } catch(e){ pollStatus.textContent = 'Network hiccup, retrying…'; continue; }
+
+    if(data.access_token){
+      state.gh.token = data.access_token;
+      state.gh.connected = false; // connected-to-repo happens on Load
+      ghSaveToken(data.access_token); // remembered on this computer until sign-out or expiry
+      $('#ghDeviceBox').classList.add('hidden');
+      pollStatus.textContent = '';
+      await ghOnAuthenticated();
+      return;
+    }
+    switch(data.error){
+      case 'authorization_pending': pollStatus.textContent = 'Waiting for you to authorize…'; break;
+      case 'slow_down': wait += 5; pollStatus.textContent = 'Slowing down polling…'; break;
+      case 'expired_token':
+        pollStatus.textContent = 'Code expired. Click Connect GitHub to get a new one.';
+        $('#ghConnect').disabled = false; return;
+      case 'access_denied':
+        pollStatus.textContent = 'Authorization was denied.';
+        $('#ghConnect').disabled = false; return;
+      default:
+        pollStatus.textContent = data.error_description || data.error || 'Unknown error.';
+    }
+  }
+  pollStatus.textContent = 'Timed out waiting for authorization. Try Connect GitHub again.';
+  $('#ghConnect').disabled = false;
+}
+
+async function ghOnAuthenticated(){
+  // Confirm who we signed in as, then enable loading. Also catches the case
+  // where a remembered token has expired or been revoked since last time.
+  try{
+    const res = await fetch('https://api.github.com/user', { headers: ghHeaders() });
+    if(res.status === 401){
+      ghForgetToken('Your saved GitHub session expired. Click “Connect GitHub” to sign in again.');
+      return;
+    }
+    const me = await res.json();
+    const login = me.login ? `@${me.login}` : 'your account';
+    $('#ghStatus').textContent = `Signed in as ${login}. Pick a region and click “Load region”.`;
+    showToast(`Signed in as ${login}.`, 'ok');
+  } catch(e){
+    $('#ghStatus').textContent = 'Signed in. Pick a region and click “Load region”.';
+  }
+  $('#ghConnect').disabled = true; $('#ghConnect').textContent = 'Connected';
+  $('#ghLoad').disabled = false;
+}
+
+async function ghLoadRegion(){
+  if(!state.gh.token){ showToast('Sign in with “Connect GitHub” first.', 'bad'); return; }
+  const region = $('#ghRegion').value;
+  state.gh.region = region;
+  const statusEl = $('#ghStatus');
+  const loadBtn = $('#ghLoad');
   statusEl.textContent = `Loading ${region} from ${GH_OWNER}/${GH_REPO}@${GH_BRANCH}…`;
+  loadBtn.disabled = true; loadBtn.textContent = 'Loading…';
   try{
     const [loa, ownership, volumes] = await Promise.all([ghGetFile('loa'), ghGetFile('ownership'), ghGetFile('volumes')]);
     Object.assign(state, { loa, ownership, volumes, currentSector: Object.keys(loa)[0] || null, selectedWaypoint:null, selectedVolume:null });
@@ -117,12 +227,21 @@ async function ghConnectAndLoad(){
     statusEl.textContent = `Failed to load ${region}: ${err.message}`;
     showToast(err.message, 'bad');
   }
+  loadBtn.disabled = false; loadBtn.textContent = 'Load region';
   refreshCommitBar();
 }
-function ghForgetToken(){
+
+function ghForgetToken(message){
   state.gh.token = null;
-  $('#ghToken').value = '';
-  showToast('Token cleared from memory.', 'ok');
+  state.gh.connected = false;
+  state.gh.baseline = {loa:null,ownership:null,volumes:null};
+  ghClearSavedToken();
+  $('#ghConnect').disabled = false; $('#ghConnect').textContent = 'Connect GitHub';
+  $('#ghLoad').disabled = true;
+  $('#ghDeviceBox').classList.add('hidden');
+  $('#ghStatus').textContent = message || 'Signed out. Click “Connect GitHub” to sign in again.';
+  if(!message) showToast('Signed out.', 'ok');
+  refreshCommitBar();
 }
 
 function readFile(input, key){
@@ -158,59 +277,73 @@ function renderLoa(){
  const root=$('#loa'); if(!state.loa){root.innerHTML='<div class="card">Load an LOA JSON file to begin.</div>'; return;}
  const sectors=Object.keys(state.loa).sort(); if(!state.currentSector) state.currentSector=sectors[0];
  const rules=state.loa[state.currentSector]?.[state.loaKind] || [];
- const waypointGroups=getWaypointGroups(rules);
- if(state.selectedWaypoint && !waypointGroups.some(g=>g.key===state.selectedWaypoint)) state.selectedWaypoint=null;
- root.innerHTML=`<div class="loa-layout"><aside class="side card"><h3>Sectors</h3><input id="sectorSearch" placeholder="Search sectors"><div class="sector-list">${sectors.map(s=>`<button class="${s===state.currentSector?'active':''}" data-sector="${s}">${s}</button>`).join('')}</div><button id="addSector">+ Add sector</button></aside><section><div class="toolbar loa-toolbar"><input id="waypointSearch" placeholder="Search waypoint/COP, origin, destination, sector"><select id="loaKind"><option value="destinationLoas">Destination LOAs</option><option value="departureLoas">Departure LOAs</option></select><button id="addRule" class="primary">+ Add rule</button></div><h2>${state.currentSector} · ${state.loaKind} <span class="muted">(${rules.length} rules)</span></h2><div class="loa-workspace"><div class="card waypoint-panel"><h3>Waypoints / COPs</h3><p class="small">Click a waypoint or COP to open its customization window.</p><div id="waypointList"></div></div><div id="waypointDetails" class="card details-panel"></div></div></section></div><div id="editModal" class="modal hidden"><div class="modal-backdrop" data-close-modal></div><div class="modal-card"><div class="rule-head"><h2 id="modalTitle">Customize LOA</h2><button data-close-modal>Close</button></div><div id="modalBody"></div></div></div>`;
+ const nextSectorGroups=getNextSectorGroups(rules);
+ if(state.selectedWaypoint && !nextSectorGroups.some(g=>g.key===state.selectedWaypoint)) state.selectedWaypoint=null;
+ root.innerHTML=`<div class="loa-layout"><aside class="side card"><h3>Sectors</h3><input id="sectorSearch" placeholder="Search sectors"><div class="sector-list">${sectors.map(s=>`<button class="${s===state.currentSector?'active':''}" data-sector="${s}">${s}</button>`).join('')}</div><button id="addSector">+ Add sector</button></aside><section><div class="toolbar loa-toolbar"><input id="waypointSearch" placeholder="Search next sector, COP, origin, destination"><select id="loaKind"><option value="destinationLoas">Destination LOAs</option><option value="departureLoas">Departure LOAs</option></select><button id="addRule" class="primary">+ Add rule</button></div><h2>${state.currentSector} · ${state.loaKind} <span class="muted">(${rules.length} rules)</span></h2><div class="loa-workspace"><div class="card waypoint-panel"><h3>Next Sectors</h3><p class="small">Click a next sector to see all LOA rules that hand off to it.</p><div id="waypointList"></div></div><div id="waypointDetails" class="card details-panel"></div></div></section></div><div id="editModal" class="modal hidden"><div class="modal-backdrop" data-close-modal></div><div class="modal-card"><div class="rule-head"><h2 id="modalTitle">Customize LOA</h2><button data-close-modal>Close</button></div><div id="modalBody"></div></div></div>`;
  $('#loaKind').value=state.loaKind;
  document.querySelectorAll('[data-sector]').forEach(b=>b.onclick=()=>{state.currentSector=b.dataset.sector; state.selectedWaypoint=null; renderLoa();});
  $('#loaKind').onchange=e=>{state.loaKind=e.target.value; state.selectedWaypoint=null; renderLoa();};
  $('#addSector').onclick=()=>{const n=prompt('New sector ID'); if(n&&!state.loa[n]){state.loa[n]={destinationLoas:[],departureLoas:[]}; state.currentSector=n; state.selectedWaypoint=null; render();}};
- $('#addRule').onclick=()=>{rules.push({origins:[],destinations:[],xfl:0,nextSectors:[],copText:'NEW',waypoints:['NEW']}); state.selectedWaypoint='NEW'; renderLoa(); openWaypointEditor('NEW'); refreshCommitBar();};
+ $('#addRule').onclick=()=>{rules.push({origins:[],destinations:[],xfl:0,nextSectors:[],copText:'NEW',waypoints:['NEW']}); state.selectedWaypoint='(No next sector)'; renderLoa(); openNextSectorEditor('(No next sector)'); refreshCommitBar()};
  $('#sectorSearch').oninput=e=>{const q=e.target.value.toUpperCase(); document.querySelectorAll('[data-sector]').forEach(b=>b.style.display=b.textContent.includes(q)?'block':'none')};
  $('#waypointSearch').oninput=e=>drawWaypoints(e.target.value.toLowerCase());
  document.querySelectorAll('[data-close-modal]').forEach(x=>x.onclick=closeModal);
  drawWaypoints('');
  drawWaypointDetails();
 }
-function getRuleWaypointKeys(rule){
- const keys=[];
- (rule.waypoints||[]).forEach(w=>keys.push(w));
- if(rule.copText && !keys.includes(rule.copText)) keys.push(rule.copText);
- if(!keys.length) keys.push('(No waypoint/COP)');
- return keys;
-}
-function getWaypointGroups(rules){
+function getNextSectorGroups(rules){
+ // Group rules by their nextSectors entries. A rule with multiple nextSectors
+ // appears under each of them. Rules with no nextSectors go under '(No next sector)'.
  const map=new Map();
- rules.forEach((r,i)=>getRuleWaypointKeys(r).forEach(k=>{
-   if(!map.has(k)) map.set(k,{key:k,rules:[],dest:new Set(),orig:new Set(),next:new Set(),xfl:new Set()});
-   const g=map.get(k); g.rules.push(i);
-   (r.destinations||[]).forEach(x=>g.dest.add(x)); (r.origins||[]).forEach(x=>g.orig.add(x));
-   (r.nextSectors||[]).forEach(x=>g.next.add(x)); if(r.xfl!==undefined) g.xfl.add(r.xfl);
- }));
+ rules.forEach((r,i)=>{
+   const keys=(r.nextSectors||[]).length ? r.nextSectors : ['(No next sector)'];
+   keys.forEach(k=>{
+     if(!map.has(k)) map.set(k,{key:k,rules:[],cops:new Set(),dest:new Set(),orig:new Set(),xfl:new Set()});
+     const g=map.get(k); g.rules.push(i);
+     if(r.copText) g.cops.add(r.copText);
+     (r.waypoints||[]).forEach(x=>g.cops.add(x));
+     (r.destinations||[]).forEach(x=>g.dest.add(x));
+     (r.origins||[]).forEach(x=>g.orig.add(x));
+     if(r.xfl!==undefined) g.xfl.add(r.xfl);
+   });
+ });
  return [...map.values()].sort((a,b)=>a.key.localeCompare(b.key));
 }
 function drawWaypoints(q){
+ // "waypoints" panel now lists Next Sectors
  const rules=state.loa[state.currentSector]?.[state.loaKind] || [];
- const groups=getWaypointGroups(rules).filter(g=>!q || g.key.toLowerCase().includes(q) || g.rules.some(i=>JSON.stringify(rules[i]).toLowerCase().includes(q)));
- $('#waypointList').innerHTML=groups.map(g=>`<button class="waypoint-item ${g.key===state.selectedWaypoint?'active':''}" data-waypoint="${esc(g.key)}"><strong>${esc(g.key)}</strong><span>${g.rules.length} rule${g.rules.length===1?'':'s'}</span><small>${esc([...g.next].slice(0,4).join(', ') || 'No next sector')}</small></button>`).join('') || '<div class="empty">No matching waypoints.</div>';
+ const groups=getNextSectorGroups(rules).filter(g=>
+   !q || g.key.toLowerCase().includes(q) ||
+   g.rules.some(i=>JSON.stringify(rules[i]).toLowerCase().includes(q))
+ );
+ $('#waypointList').innerHTML=groups.map(g=>`<button class="waypoint-item ${g.key===state.selectedWaypoint?'active':''}" data-waypoint="${esc(g.key)}"><strong>${esc(g.key)}</strong><span>${g.rules.length} rule${g.rules.length===1?'':'s'}</span><small>${esc([...g.cops].slice(0,4).join(', ') || 'No waypoints/COPs')}</small></button>`).join('') || '<div class="empty">No matching next sectors.</div>';
  document.querySelectorAll('[data-waypoint]').forEach(b=>b.onclick=()=>{state.selectedWaypoint=b.dataset.waypoint; drawWaypoints(q); drawWaypointDetails();});
 }
 function drawWaypointDetails(){
  const box=$('#waypointDetails'); if(!box) return;
  const rules=state.loa[state.currentSector]?.[state.loaKind] || [];
- if(!state.selectedWaypoint){ box.innerHTML='<h3>Select a waypoint</h3><p class="small">Choose a waypoint/COP from the list to review and edit matching LOA rules.</p>'; return; }
- const idxs=rules.map((r,i)=>({r,i})).filter(({r})=>getRuleWaypointKeys(r).includes(state.selectedWaypoint));
- box.innerHTML=`<div class="rule-head"><div><h3>${esc(state.selectedWaypoint)}</h3><p class="small">${idxs.length} matching rule${idxs.length===1?'':'s'} in ${esc(state.currentSector)}</p></div><button class="primary" id="customizeWaypoint">Customize</button></div><div class="summary-grid">${idxs.map(({r,i})=>`<button class="summary-card" data-rule-open="${i}"><strong>#${i+1} · ${esc(r.copText||'No COP')}</strong><span>XFL ${esc(r.xfl ?? '')} · Next: ${esc((r.nextSectors||[]).join(', ')||'—')}</span><small>${esc([...(r.destinations||[]),...(r.origins||[])].slice(0,8).join(', ')||'No origins/destinations')}</small></button>`).join('')}</div>`;
- $('#customizeWaypoint').onclick=()=>openWaypointEditor(state.selectedWaypoint);
+ if(!state.selectedWaypoint){ box.innerHTML='<h3>Select a next sector</h3><p class="small">Choose a next sector from the list to review and edit all LOA rules that hand off to it.</p>'; return; }
+ // Find rules that belong to this next sector group
+ const matchKey=state.selectedWaypoint;
+ const idxs=rules.map((r,i)=>({r,i})).filter(({r})=>{
+   const keys=(r.nextSectors||[]).length ? r.nextSectors : ['(No next sector)'];
+   return keys.includes(matchKey);
+ });
+ box.innerHTML=`<div class="rule-head"><div><h3>${esc(state.selectedWaypoint)}</h3><p class="small">${idxs.length} rule${idxs.length===1?'':'s'} in ${esc(state.currentSector)} handing off to this sector</p></div><button class="primary" id="customizeWaypoint">Edit all</button></div><div class="summary-grid">${idxs.map(({r,i})=>`<button class="summary-card" data-rule-open="${i}"><strong>#${i+1} · ${esc(r.copText||'No COP')}</strong><span>XFL ${esc(r.xfl ?? '')} · COP: ${esc((r.waypoints||[]).join(', ')||r.copText||'—')}</span><small>${esc([...(r.destinations||[]),...(r.origins||[])].slice(0,8).join(', ')||'No origins/destinations')}</small></button>`).join('')}</div>`;
+ $('#customizeWaypoint').onclick=()=>openNextSectorEditor(state.selectedWaypoint);
  document.querySelectorAll('[data-rule-open]').forEach(b=>b.onclick=()=>openRuleEditor(+b.dataset.ruleOpen));
 }
 function openModal(title, body){ $('#modalTitle').textContent=title; $('#modalBody').innerHTML=body; $('#editModal').classList.remove('hidden'); bindRuleButtons(); }
 function closeModal(){ const m=$('#editModal'); if(m) m.classList.add('hidden'); }
-function openWaypointEditor(key){
- state.selectedWaypoint=key;
+function openNextSectorEditor(nextSector){
+ state.selectedWaypoint=nextSector;
  const rules=state.loa[state.currentSector]?.[state.loaKind] || [];
- const idxs=rules.map((r,i)=>({r,i})).filter(({r})=>getRuleWaypointKeys(r).includes(key));
- openModal(`${state.currentSector} · ${key}`, idxs.map(({r,i})=>ruleHtml(r,i)).join('') || '<div class="card">No matching rules.</div>');
+ const matchKey=nextSector;
+ const idxs=rules.map((r,i)=>({r,i})).filter(({r})=>{
+   const keys=(r.nextSectors||[]).length ? r.nextSectors : ['(No next sector)'];
+   return keys.includes(matchKey);
+ });
+ openModal(`${state.currentSector} → ${nextSector}`, idxs.map(({r,i})=>ruleHtml(r,i)).join('') || '<div class="card">No matching rules.</div>');
 }
 function openRuleEditor(i){
  const rules=state.loa[state.currentSector]?.[state.loaKind] || [];
@@ -223,7 +356,7 @@ function ruleHtml(rule,i){
 }
 function bindRuleButtons(){
  const rules=state.loa[state.currentSector]?.[state.loaKind] || [];
- document.querySelectorAll('[data-save-rule]').forEach(b=>b.onclick=()=>{renderLoa(); if(state.selectedWaypoint) openWaypointEditor(state.selectedWaypoint); refreshCommitBar();});
+ document.querySelectorAll('[data-save-rule]').forEach(b=>b.onclick=()=>{renderLoa(); if(state.selectedWaypoint) openNextSectorEditor(state.selectedWaypoint); refreshCommitBar();});
  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{rules.splice(+b.dataset.del,1); closeModal(); renderLoa(); refreshCommitBar();});
  document.querySelectorAll('[data-dup]').forEach(b=>b.onclick=()=>{rules.splice(+b.dataset.dup+1,0,clone(rules[+b.dataset.dup])); renderLoa(); openRuleEditor(+b.dataset.dup+1); refreshCommitBar();});
 }
@@ -290,11 +423,24 @@ $('#exportAll').onclick=()=>{ if(state.loa)download('LOA.json',state.loa); if(st
 readFile($('#loaFile'),'loa'); readFile($('#ownershipFile'),'ownership'); readFile($('#volumesFile'),'volumes');
 
 $('#ghRegion').innerHTML = GH_REGIONS.map(r=>`<option value="${esc(r)}">${esc(r)}</option>`).join('');
-$('#ghConnect').onclick = ghConnectAndLoad;
-$('#ghForget').onclick = ghForgetToken;
+$('#ghConnect').onclick = ghStartDeviceFlow;
+$('#ghLoad').onclick = ghLoadRegion;
+$('#ghForget').onclick = ()=>ghForgetToken();
+$('#ghCopyCode').onclick = ()=>{ const code = $('#ghUserCode').textContent; navigator.clipboard?.writeText(code).then(()=>showToast('Code copied.', 'ok'), ()=>{}); };
 $('#commitLoa').onclick = ()=>commitFile('loa', $('#commitLoa'));
 $('#commitOwnership').onclick = ()=>commitFile('ownership', $('#commitOwnership'));
 $('#commitVolumes').onclick = ()=>commitFile('volumes', $('#commitVolumes'));
 $('#commitAll').onclick = commitAllChanged;
 
 refreshCommitBar();
+
+// If a token was saved on this computer from a previous visit, sign back in
+// automatically instead of asking to reconnect. ghOnAuthenticated will detect
+// and clear it gracefully if it has since expired or been revoked.
+(function ghRestoreSession(){
+  const saved = ghLoadSavedToken();
+  if(saved){
+    state.gh.token = saved;
+    ghOnAuthenticated();
+  }
+})();

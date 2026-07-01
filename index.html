@@ -20,13 +20,19 @@
 
 <section class="card gh-panel">
   <div class="gh-row">
-    <label>GitHub token <input type="password" id="ghToken" placeholder="ghp_... (fine-grained PAT, Contents: Read & write)" autocomplete="off"></label>
     <label>Region / ICAO folder <select id="ghRegion"></select></label>
-    <button id="ghConnect" class="primary">Connect &amp; load</button>
+    <button id="ghConnect" class="primary">Connect GitHub</button>
+    <button id="ghLoad" class="primary" disabled>Load region</button>
+  </div>
+  <div id="ghDeviceBox" class="gh-device hidden">
+    <p class="small" style="margin:0 0 6px">1. Open <a id="ghVerifyLink" href="https://github.com/login/device" target="_blank" rel="noopener">github.com/login/device</a> &nbsp;2. Enter this code:</p>
+    <div class="device-code" id="ghUserCode">––––-––––</div>
+    <button id="ghCopyCode" class="small-btn">Copy code</button>
+    <span class="small muted" id="ghPollStatus">Waiting for you to authorize…</span>
   </div>
   <div class="gh-row gh-status-row">
-    <span id="ghStatus" class="small muted">Not connected. Paste a token scoped to Chross2996/LOA-Plugin-Files and pick a region.</span>
-    <button id="ghForget" class="small-btn">Forget token</button>
+    <span id="ghStatus" class="small muted">Not connected. Click “Connect GitHub” to sign in, then pick a region and load.</span>
+    <button id="ghForget" class="small-btn">Sign out</button>
   </div>
 </section>
 
